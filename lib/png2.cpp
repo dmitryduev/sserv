@@ -34,6 +34,24 @@ freely, subject to the following restrictions:
 
 //using namespace std;
 
+#include <cerrno>
+
+std::string get_file_contents(const char *filename)
+{
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (in)
+  {
+    std::string contents;
+    in.seekg(0, std::ios::end);
+    contents.resize(in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&contents[0], contents.size());
+    in.close();
+    return(contents);
+  }
+  throw(errno);
+}
+
 void split(const std::string& s, char c, std::vector<std::string>& v) {
    std::string::size_type i = 0;
    std::string::size_type j = s.find(c);
@@ -573,10 +591,6 @@ std::vector<std::vector<unsigned char>> cm_dawn() {
    return dawn;
 }
 
-/*
-3 ways to encode a PNG from RGBA pixel data to a file (and 2 in-memory ways).
-*/
-
 //g++ lodepng.cpp example_encode.cpp -ansi -pedantic -Wall -Wextra -O3
 
 //Example 1
@@ -605,7 +619,7 @@ int main(int argc, char *argv[])
    //filename1 = (const char *)((output_dir + f_v).c_str());
    //std::cout << filename << "\n";
    //const char* filename = argc == 2 ? argv[1] + "vicd.png" : "../public/vicd.png";
-  
+   
    // read in the status file into a std::string
    //std::ifstream ifs("/home/roboao/Status/vicd_image_status");
    std::string telemetry_dir("/Users/dmitryduev/web/sserv/telemetry");
@@ -614,10 +628,12 @@ int main(int argc, char *argv[])
    if (argc == 3) {
       telemetry_dir = argv[2];
    }
-   std::ifstream ifs((telemetry_dir + f_v_s).c_str());
-   std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                        (std::istreambuf_iterator<char>()    ) );
-
+   //std::ifstream ifs((telemetry_dir + f_v_s).c_str());
+   //std::string content( (std::istreambuf_iterator<char>(ifs) ),
+   //                     (std::istreambuf_iterator<char>()    ) );
+   //std::cout << content;
+   
+   std::string content( get_file_contents((telemetry_dir + f_v_s).c_str()) );
    //std::cout << content;
    
    // split the string into a vector of strings 
@@ -680,11 +696,13 @@ int main(int argc, char *argv[])
    //std::ifstream ifs2("/home/roboao/Status/wfs_image_status_status");
    //std::ifstream ifs2("/Users/dmitryduev/web/sserv/telemetry/wfs_image_status_status");
    std::string f_w_s("/wfs_image_status_status");
-   std::ifstream ifs2((telemetry_dir + f_w_s).c_str());
-   std::string content2( (std::istreambuf_iterator<char>(ifs2) ),
-                        (std::istreambuf_iterator<char>()    ) );
+   //std::ifstream ifs2((telemetry_dir + f_w_s).c_str());
+   //std::string content2( (std::istreambuf_iterator<char>(ifs2) ),
+   //                      (std::istreambuf_iterator<char>()    ) );
 
    //std::cout << content2;
+   
+   std::string content2( get_file_contents((telemetry_dir + f_w_s).c_str()) );
    
    // split the string into a vector of strings 
    std::vector<std::string> v2;
@@ -727,10 +745,12 @@ int main(int argc, char *argv[])
    //std::ifstream ifs3("/home/roboao/Status/new_pos_status_status");
    //std::ifstream ifs3("/Users/dmitryduev/web/sserv/telemetry/new_pos_status_status");
    std::string f_d_s("/new_pos_status_status");
-   std::ifstream ifs3((telemetry_dir + f_d_s).c_str());
-   std::string content3( (std::istreambuf_iterator<char>(ifs3) ),
-                        (std::istreambuf_iterator<char>()    ) );
+   //std::ifstream ifs3((telemetry_dir + f_d_s).c_str());
+   //std::string content3( (std::istreambuf_iterator<char>(ifs3) ),
+   //                      (std::istreambuf_iterator<char>()    ) );
 
+   std::string content3( get_file_contents((telemetry_dir + f_d_s).c_str()) );
+   
    // split the string into a vector of strings 
    std::vector<std::string> v3;
    split(content3, ' ', v3);

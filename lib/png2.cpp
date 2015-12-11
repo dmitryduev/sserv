@@ -598,11 +598,12 @@ int main(int argc, char *argv[])
    //NOTE: this program will overwrite the file or vicd.png without warning!
    std::string output_dir("../public/");
    std::string f_v("/vicd.png");
-   const char* filename; // default
+   //const char* filename1;//("/Users/dmitryduev/web/sserv/public/vicd.png"); // default
    if (argc >= 2) {
-      output_dir = argv[1];
+      output_dir = (std::string)argv[1];
    }
-   filename = (output_dir + f_v).c_str();
+   //filename1 = (const char *)((output_dir + f_v).c_str());
+   //std::cout << filename << "\n";
    //const char* filename = argc == 2 ? argv[1] + "vicd.png" : "../public/vicd.png";
   
    // read in the status file into a std::string
@@ -667,12 +668,13 @@ int main(int argc, char *argv[])
  
    //output image
    //unsigned width = 1024, height = 1024;
-   encodeOneStep(filename, image, w, h);
+   encodeOneStep((output_dir + f_v).c_str(), image, w, h);
 
    // ----------- WFS  -------------
    //filename = argc > 2 ? argv[2] : "../public/wfs.png";
+   //const char* filename2;
    std::string f_w("/wfs.png");
-   filename = (output_dir + f_w).c_str();
+   //filename2 = (const char*)((output_dir + f_w).c_str());
   
    // read in the status file into a std::string
    //std::ifstream ifs2("/home/roboao/Status/wfs_image_status_status");
@@ -713,13 +715,14 @@ int main(int argc, char *argv[])
    }
  
    //output image
-   encodeOneStep(filename, image2, w2, h2);
+   encodeOneStep((output_dir + f_w).c_str(), image2, w2, h2);
 
    // ----------- DM  -------------
    //filename = argc > 3 ? argv[3] : "../public/dm.png";
-   std::string f_d("/wfs.png");
-   filename = (output_dir + f_d).c_str();
-  
+   //const char* filename3;
+   std::string f_d("/dm.png");
+   //filename3 = (const char*)((output_dir + f_d).c_str());
+   //std::cout << filename3 << "\n"; 
    // read in the status file into a std::string
    //std::ifstream ifs3("/home/roboao/Status/new_pos_status_status");
    //std::ifstream ifs3("/Users/dmitryduev/web/sserv/telemetry/new_pos_status_status");
@@ -789,6 +792,6 @@ int main(int argc, char *argv[])
      }
    } 
    //output image
-   encodeOneStep(filename, image3, w3, h3);
+   encodeOneStep((output_dir + f_d).c_str(), image3, w3, h3);
 
 }

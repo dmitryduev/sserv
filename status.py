@@ -195,7 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('--ssl', action='store_true')
     args = parser.parse_args()
 
-    aps = RoboAOstatus(host='ws://'+args.host+':'+args.port+'/ws')
+    aps = RoboAOstatus(host='ws://'+args.host+':'+str(args.port)+'/ws')
     try:
         aps.run()
     except KeyboardInterrupt:

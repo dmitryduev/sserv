@@ -10,16 +10,16 @@ import time
 
 if __name__ == '__main__':
     
-#    server = subprocess.Popen('./server-daemon.sh', shell=True)
+    server = subprocess.Popen('./server-daemon.sh', shell=True)
 #    print server.pid
     
     # wait for the server to start, then begin to send telemetry
-#    time.sleep(2)
-#    status = subprocess.Popen('./status-daemon.sh', shell=True)
+    time.sleep(2)
+    status = subprocess.Popen('./status-daemon.sh', shell=True)
     
     # finally, run the png generating engine
 #    png = subprocess.Popen('./png-daemon.sh', shell=True)
-    png = subprocess.Popen('watch -n 0.5 ./lib/png2', shell=True)
+#    png = subprocess.Popen('watch -n 0.5 ./lib/png2 ', shell=True)
     
 #    sig1, sig2 = 1, 1
 #    while sig1 != 0 and sig2 != 0:

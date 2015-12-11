@@ -1,0 +1,113 @@
+@media only screen and (max-width: 768px) {
+	#col-log {
+		display:none;
+	}
+	#col-log-2 {
+		display:none;
+	}
+}
+
+@media only screen and (min-width: 769px) {
+	#col-log {
+		display:table-cell;
+	}
+	#col-log-2 {
+		display:table-cell;
+	}
+}
+
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: static;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+  margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+  width: auto;
+}
+
+.borderless tbody tr td, .borderless tbody tr th, .borderless thead tr th {
+  border: none;
+  padding:0; 
+  margin:0;
+  border-collapse: collapse;
+}
+
+.table-condensed>thead>tr>th, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>th, 
+ .table-condensed>thead>tr>td, .table-condensed>tbody>tr>td, .table-condensed>tfoot>tr>td {
+    padding: 0px;
+    margin: 0px;
+}
+
+.danger {
+   color: #f2d8d8;
+}
+
+    .dygraph-ylabel {
+    	font-size: 10px;
+    	line-height: 100%;
+    }
+    
+    .dygraph-title { font-size: 10px; line-height: 100%; margin:10px; }
+    
+    .dygraph-axis-label { font-size: 10px; }
+    
+    .dygraph-legend { font-size: 10px; }
+    
+    html, body {
+       height:100%;
+    }
+    .container-fluid {
+       height:100%;
+       display:table;
+       width: 100%;
+       margin-top: 0px;
+       -moz-box-sizing: border-box;
+       box-sizing: border-box;
+       padding-right: 0px;
+    }
+    .log-r {
+       border-style: solid;
+       border-width: 2px 0px 0px 0px;
+       border-color: #900;
+    }
+    .log-g {
+       border-style: solid;
+       border-width: 2px 0px 0px 0px;
+       border-color: #090;
+    }
+    .log-y {
+       border-style: solid;
+       border-width: 2px 0px 0px 0px;
+       border-color: #990;
+    }
+    .table td, .table th {
+       border-right: 1px solid #ddd;
+    }
+    
+    .panel-heading-sm{
+       height: 20px;
+       padding: 3px 10px;
+    }
+
+    .panel-body-sm{
+       padding: 5px 10px;
+    }
+    
+    ::-webkit-scrollbar{
+  background:transparent;
+} //end of the code here
+// this code for further customization of thumbs
+::-webkit-scrollbar-thumb{
+   background-color: rgba(0,0,0,0);
+
+}

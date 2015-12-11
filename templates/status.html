@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head 
+          content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Dr. Dmitry A. Duev">
+
+    <title>Robo-AO status</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="/static/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/theme.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!--
+    <script src="//oss.maxcdn.com/bootbox/4.4.0/bootbox.min.js"></script>
+    -->
+    
+      <!-- WS -->
+      <script type='application/javascript'>
+        $(document).ready(function() {
+
+          websocket = 'ws://{{host}}:{{port}}/ws';
+          if (window.WebSocket) {
+            ws = new WebSocket(websocket);
+          }
+          else if (window.MozWebSocket) {
+            ws = MozWebSocket(websocket);
+          }
+          else {
+            console.log('WebSocket Not Supported');
+            return;
+          }
+
+          window.onbeforeunload = function(e) {
+            //$('#chat').val($('#chat').val() + 'Bye bye...\\n');
+            ws.close(1000, '');
+
+            if(!e) e = window.event;
+            e.stopPropagation();
+            e.preventDefault();
+          };
+          
+          // keep plots in one place:
+          plots = {};
+          
+          // received stuff from status.py
+          ws.onmessage = function (evt) {
+             // parse json data
+             data = JSON.parse(evt.data);
+             // loop through key=systems:
+             for (var key in data) {
+				// by default, the panel face is painted gray.
+				// this changes if any of the params is "critical" and colored
+				panel_color = "default";
+                //document.write(key+'\n');
+                if (data.hasOwnProperty(key)) {
+                   // make sure the panel is displayed:
+                   document.getElementById(key).style.display = "block";
+                   // global params
+                   for (var key2 in data[key]["globals"]) {
+                      if (data[key]["globals"].hasOwnProperty(key2)) {
+                         //document.write(key2 + " -> " + data[key]["globals"][key2]);
+                         //save current value and color:
+                         tmp_val = document.getElementById(key+":"+key2).innerHTML;
+                         tmp_col = document.getElementById(key+":"+key2).className;
+                         // value:
+                         document.getElementById(key + ":" + key2).innerHTML = 
+                                                            data[key]["globals"][key2][0];
+                         // color:
+                         document.getElementById(key + ":" + key2).className = 
+                                                            data[key]["globals"][key2][1];
+                         // log if something turned red or yellow
+                         if ((tmp_col != "danger" && 
+                              data[key]["globals"][key2][1] == "danger") ||
+                              (tmp_col != "warning" && 
+                              data[key]["globals"][key2][1] == "warning")) {
+                            logit(data[key]["globals"][key2][1], 
+                                  key+":"+key2+ "<br>" + 
+                                  tmp_val + " -> " + data[key]["globals"][key2][0]);
+                         }
+                         
+                         // TODO: here come the plots
+                         
+                         // colorize panel face if param is critical
+                         if (data[key]["globals"][key2][3]) { // critical?
+							 switch (panel_color) {
+							    case "default":
+							    	panel_color = data[key]["globals"][key2][1];
+							    	break;
+							    case "success":
+							     	if (data[key]["globals"][key2][1]=="danger" || 
+							     	    data[key]["globals"][key2][1]=="warning") {
+								    	panel_color = data[key]["globals"][key2][1];
+								    }
+							     	break;
+							 	case "warning":
+								    if (data[key]["globals"][key2][1]=="danger") {
+								    	panel_color = data[key]["globals"][key2][1];
+								    }
+								    break;
+								case "danger":
+								    break;
+							 }
+						 }
+                      }
+                   }
+                   // "sub-systems"
+                   for (var key2 in data[key]["subs"]) {
+                      if (data[key]["subs"].hasOwnProperty(key2)) {
+                         //document.write(key2);
+                         for (var key3 in data[key]["subs"][key2]) {
+                            //document.write(key3 + " -> " + data[key]["subs"][key2][key3]);
+                            //save current value and color:
+                            tmp_val = document.getElementById(key+":"+key2+":"+key3).innerHTML;
+                            tmp_col = document.getElementById(key+":"+key2+":"+key3).className;
+                            // value:
+                            document.getElementById(key+":"+key2+":"+key3).innerHTML = 
+                                                         data[key]["subs"][key2][key3][0];
+                            // color:
+                            document.getElementById(key+":"+key2+":"+key3).className = 
+                                                         data[key]["subs"][key2][key3][1];
+                            // log if something turned red or yellow
+                            if ((tmp_col != "danger" && 
+                                 data[key]["subs"][key2][key3][1] == "danger") ||
+                                 (tmp_col != "warning" && 
+                                 data[key]["subs"][key2][key3][1] == "warning")) {
+                               logit(data[key]["subs"][key2][key3][1], 
+                                     key+":"+key2+":"+key3 + "<br>" + 
+                                     tmp_val + " -> " + data[key]["subs"][key2][key3][0]);
+                            }
+                            // plot stuff if set in config.json
+                            if (data[key]["subs"][key2][key3][2]) {
+                            	// make sure the dropdown toggle for the plots part of panel is displayed:
+                            	document.getElementById(key+"-dropdown").style.display = "block";
+	                            // make sure the plots part of panel is displayed:
+    			                //document.getElementById(key+"-plots").style.display = "block";
+								// allocate place for array and for the plot if necessary:
+								divid = key+":"+key2+":"+key3+":plot";
+								if ( !plots.hasOwnProperty(divid) ) {
+									// div for da plot exists?
+									var plot_divs = $("[id='" + key + "-plots-container'] > div").map(function(){
+										return this.id;
+									}).get();
+									//document.write(plot_divs);
+									// no? i can haz div?
+									if (plot_divs.indexOf(divid)==-1) {
+										$("[id='" + key + "-plots-container']").prepend( "<div id=\"" + divid + 
+      					                   "\" style=\"height:120px; padding:0px; margin-left:-40px;\"></div>" +
+      					                   "<hr style='margin:0 -10px 0 -10px;'>" );;
+									}
+									// init plot:
+									g = plot_init(divid, divid)
+									// keep it in a drak and dry place:
+									plots[divid] = [[], g];
+								}
+								// date in UTC:
+								t = new Date(data[key]["globals"]["Time stamp"][0] + "Z");
+								// data point:
+								x = data[key]["subs"][key2][key3][0];
+								
+								// check if the current t is not in there already
+								if (plots[divid][0].length==0 || 
+								  plots[divid][0][plots[divid][0].length-1][0].getTime()!=t.getTime()) {
+									// save these:
+									plots[divid][0].push([t, x]);
+									// array too long? we're displaying the last N points only
+									if (plots[divid][0].length > 600) {
+										plots[divid][0].shift();
+									}
+									// make/update plot:
+									//plots[divid][1].updateSize();
+									plots[divid][1].updateOptions( { 'file': plots[divid][0] } )
+								}
+                            }
+                            // colorize panel face if param is critical
+							if (data[key]["subs"][key2][key3][3]) { // critical?
+								 switch (panel_color) {
+									case "default":
+										panel_color = data[key]["subs"][key2][key3][1];
+										break;
+									case "success":
+										if (data[key]["subs"][key2][key3][1]=="danger" || 
+											data[key]["subs"][key2][key3][1]=="warning") {
+											panel_color = data[key]["subs"][key2][key3][1];
+										}
+										break;
+									case "warning":
+										if (data[key]["subs"][key2][key3][1]=="danger") {
+											panel_color = data[key]["subs"][key2][key3][1];
+										}
+										break;
+									case "danger":
+										break;
+								 }
+							}
+                         }
+                      }
+                   }
+                   // colorize panel face
+                   document.getElementById(key).className = "panel panel-" + panel_color;
+                   // colorize label face
+                   document.getElementById(key+"-label").className = "label label-" + panel_color;
+                }
+             }
+             //document.write(data);
+             //$('#chat').val($('#chat').val() + evt.data + '\\n');
+          };
+          //ws.onopen = function() {
+          //   ws.send("%(username)s entered the room");
+          //};
+          //ws.onclose = function(evt) {
+          //   $('#chat').val($('#chat').val() + 'Connection closed by server: ' + 
+          //    evt.code + ' \"' + evt.reason + '\"\\n');
+          //};
+
+          //$('#send').click(function() {
+          //   console.log($('#message').val());
+          //   ws.send('%(username)s: ' + $('#message').val());
+          //   $('#message').val("");
+          //   return false;
+          //});
+        });
+        
+      </script>
+    
+      <!-- Show/hide plots -->
+      <script>
+      function showHidePlots(key) {
+        if ($("[id='" + key + "-dropdown']").children("span").attr("class") == "glyphicon glyphicon-menu-up") {
+				$("[id='" + key + "-dropdown']").children("span").attr("class", 
+      													"glyphicon glyphicon-menu-down");
+        		document.getElementById(key+"-plots").style.display = "none";
+        }
+        else { if ($("[id='" + key + "-dropdown']").children("span").attr("class") == "glyphicon glyphicon-menu-down") {
+				$("[id='" + key + "-dropdown']").children("span").attr("class", 
+      													"glyphicon glyphicon-menu-up");
+        		document.getElementById(key+"-plots").style.display = "block";
+        } }
+      }
+      </script>
+
+      <!-- Logging -->
+      <script>
+      function logit(color, text) {
+         var timestamp = new Date();
+         var log_class = "";
+         switch (color) {
+            case "warning":
+               log_class = "log-y";
+               break;
+            case "danger":
+               log_class = "log-r";
+               break;
+         }
+         $('#log').prepend("<p class=\"" + log_class + "\">"
+                           + timestamp.toLocaleString() + "<br>" + text + "</p>");
+         beep(color);
+      }
+      
+      // beep in case of emergency
+      function beep(cs) {
+        if (cs=="warning") {
+			document.getElementById('beep-warning').play();
+		}
+		else { if (cs=="danger") {
+		document.getElementById('beep-danger').play();
+		} }
+      }
+      </script>
+      
+      <!-- Realtime charts -->
+      <script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+      
+      <script>
+      	function plot_init(divid, yname) {
+      		var g = new Dygraph(document.getElementById(divid), [],
+                          {
+                            drawPoints: true,
+                            //ylabel: yname,
+                            title: yname,
+//                            valueRange: [0.0, 1.2],
+                            labels: ['Time', yname]
+                          });
+            return g;
+      	}
+	</script>
+
+	<script>
+	function scrollTo(div) {
+		$('html, body').animate({ scrollTop: $("[id='" + div + "']").offset().top - 40 });
+	}
+	</script>
+    
+  </head>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top font-size-small" style="margin-bottom:-20px; padding-bottom:-20px">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" 
+                   data-toggle="collapse" data-target="#navbar" 
+                    aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Robo-AO</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Status</a></li>
+            <li><a href="/image">Images</a></li>
+            <li><a href="http://www.oir.caltech.edu/twiki_oir/bin/viewauth/Palomar/RoboAO/WebHome">Twiki</a></li>
+            <li class="dropdown" style="display:none">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+                 aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    
+  <body role="document" style="padding-top:0px; padding-bottom:0px; margin-bottom:0px">
+	
+	<audio id="beep-warning" src="http://www.soundjay.com/button/beep-07.wav"></audio>
+	<audio id="beep-danger" src="http://www.soundjay.com/button/beep-22.wav"></audio>
+	
+    <div class="container-fluid theme-showcase" role="main">
+
+    <div class="row" style="height: 100%; display: table-row;">
+
+     <!-- Status data -->
+     <div class="col-md-10" style="height:100%; display:table-cell;">
+      <div class="page-header">
+        <br>
+        <h3>Robo-AO status</h3>
+      </div>
+
+      <!--
+      <form action='#' id='chatform' method='get'>
+      <textarea id='chat' cols='35' rows='10'></textarea>
+      <br>
+      <label for='message'></label><input type='text' id='message' />
+      <input id='send' type='submit' value='Send' />
+      </form>
+      <br>
+      -->
+      
+      <!-- Panels 1 in a row -->
+      {% if layout=='one' %}
+      
+      {% for system in skelet %}
+      <div class="row">
+
+      <!-- Systems -->
+      <div class="col-md-12 col-sm-9">
+       <!-- <div class="panel panel-default" style="display:none;" id="{{ system }}"> -->
+       <div class="panel panel-default" style="display:block;" id="{{ system }}">
+         <div class="panel-heading panel-heading-sm">
+           <h3 class="panel-title">{{system}}</h3>
+           <div class="pull-right" style="display:none; cursor:pointer; 
+                cursor:hand; margin-top:-12px;" id="{{system}}-dropdown" 
+                onClick="showHidePlots('{{system}}')" aria-label="plots">
+           <span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span>
+           </div>
+         </div>
+         <div class="panel-body panel-body-sm">
+         
+         <table class="table table-condensed" style="margin-bottom:5px">
+         <thead>
+
+         <tr>
+         {% if skelet[system]['globals']|length > 0 %}
+         <th colspan="{{ skelet[system]['globals']|length }}"></th>
+         {% endif %}
+         {% if skelet[system]['subs']|length > 0 %}
+         {% for key in skelet[system]['subs'] %}
+         <th colspan="{{ skelet[system]['subs'][key]|length }}" style="text-align: center;">{{ key }}</th>
+         {% endfor %}
+         {% endif %}
+         </tr>
+         
+         <tr>
+         {% if skelet[system]['globals']|length > 0 %}
+         {% for key in skelet[system]['globals'] %}
+         <th>{{ key }}</th>
+         {% endfor %}
+         {% endif %}
+         {% if skelet[system]['subs']|length > 0 %}
+         {% for key in skelet[system]['subs'] %}
+         {% for key2 in skelet[system]['subs'][key] %}
+         <th>{{ key2 }}</th>
+         {% endfor %}
+         {% endfor %}
+         {% endif %}
+         </tr>
+
+         </thead>
+         
+         <tbody>
+         <tr>
+         <!-- Global params -->
+         {% if skelet[system]['globals']|length > 0 %}
+             {% for key in skelet[system]['globals'] %}
+             <td id="{{system}}:{{key}}"></td>
+             {% endfor %}
+         {% endif %}
+         
+         <!-- Data Tables  -->
+         {% if skelet[system]['subs']|length > 0 %}
+         {% for key in skelet[system]['subs'] %}
+             {% for key2 in skelet[system]['subs'][key] %}
+             <td id="{{system}}:{{key}}:{{key2}}"></td>
+             {% endfor %}
+         {% endfor %}
+         {% endif %}
+         
+         </tr>
+         </tbody>
+         
+         </table>
+         
+         
+         <hr style="margin:0 -10px 0 -10px;">
+
+         <!-- Real time charts -->
+         <div style="display:block;" id="{{system}}-plots">
+           <!--<hr style="margin:0 -10px 0 -10px;">-->
+           <div id="{{system}}-plots-container">
+			  <!-- Placeholder for da plots -->
+		   </div>
+		  </div>
+
+         </div>
+       </div>
+      </div>
+
+
+      </div>
+
+      {% endfor %}
+      
+      {% endif %}
+      
+      
+      
+      <!-- Panels 3 in a row -->
+      {% if layout=='three' %}
+      
+      {% for system in skelet %}
+      {% if (loop.index-1) is divisibleby(3) %}
+      <div class="row">
+      {% elif loop.index is equalto 1  %}
+      <div class="row">
+      {% endif %}
+
+      <!-- Systems -->
+      <div class="col-sm-4">
+       <!-- <div class="panel panel-default" style="display:none;" id="{{ system }}"> -->
+       <div class="panel panel-default" style="display:block;" id="{{ system }}">
+         <div class="panel-heading panel-heading-sm">
+           <h3 class="panel-title">{{system}}</h3>
+           <div class="pull-right" style="display:none; cursor:pointer; 
+                cursor:hand; margin-top:-12px;" id="{{system}}-dropdown" 
+                onClick="showHidePlots('{{system}}')" aria-label="plots">
+           <span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span>
+           </div>
+         </div>
+         <div class="panel-body panel-body-sm">
+         
+         <!-- Global params -->
+         {% if skelet[system]['globals']|length > 0 %}
+         <!-- <hr style="margin:0 -10px 0 -10px;"> -->
+         <table class="table table-condensed" style="margin-bottom:5px">
+         <thead>
+         {% for key in skelet[system]['globals'] %}
+         <th>{{ key }}</th>
+         {% endfor %}
+         </thead>
+         <tbody>
+           <tr>
+             {% for key in skelet[system]['globals'] %}
+             <td id="{{system}}:{{key}}"></td>
+             {% endfor %}
+            </tr>
+         </tbody>
+         </table>
+         <!-- <hr style="margin:0 -10px 0 -10px;"> -->
+         {% endif %}
+         
+         
+         <!-- Data Tables  -->
+         {% if skelet[system]['subs']|length > 0 %}
+         {% for key in skelet[system]['subs'] %}
+         <!--<hr style="margin:0 -10px 0 -10px;">-->
+         <table class="table table-condensed" style="margin-bottom:5px">
+         <thead>
+         <th></th>
+         {% for key2 in skelet[system]['subs'][key] %}
+         <th>{{ key2 }}</th>
+         {% endfor %}
+         </thead>
+         <tbody>
+           <tr>
+             <th scope="row">{{ key }}</th>
+             {% for key2 in skelet[system]['subs'][key] %}
+             <td id="{{system}}:{{key}}:{{key2}}"></td>
+             {% endfor %}
+            </tr>
+         </tbody>
+         </table>
+         <hr style="margin:0 -10px 0 -10px;">
+         {% endfor %}
+         {% endif %}
+         
+         <!-- Real time charts -->
+         <div style="display:block;" id="{{system}}-plots">
+           <!--<hr style="margin:0 -10px 0 -10px;">-->
+           <div id="{{system}}-plots-container">
+			  <!-- Placeholder for da plots -->
+		   </div>
+		  </div>
+
+         </div>
+       </div>
+      </div>
+
+
+      {% if loop.index is divisibleby(3) or loop.index == skelet|length %}
+      </div>
+      {% endif %}
+
+
+      {% endfor %}
+      
+      {% endif %}
+
+     <br><br>
+
+     </div>
+     
+     
+     <!-- Log -->
+     <div id="col-log" class="col-md-2" style="background:#0f1420; 
+            color:#999; overflow: auto;  
+            height: 100vh; position: fixed; right: 0px;">
+     <br><br><br><br>
+		 <div id="log">
+			<!-- Log placeholder. Tell operator if something turns yellow or red -->
+		 </div>
+     </div>
+     
+     <!-- Colored labels -->
+     <div id="col-log-2" style="background:#0f1420; 
+            color:#999; z-index:200; overflow-y: scroll; overflow-x: hidden;
+            border-top: solid white 2px;
+            height: 28px; width:100%; position: fixed; right: 0px; bottom:0px;
+            padding: 0 0 0 5px; margin:0px; line-height:0.8;">
+     <br>
+     {% for system in skelet %}
+	 <span class="label label-default" id="{{ system }}-label"
+	       style="font-size: 10px; font-weight:1; cursor:pointer;" onclick="scrollTo('{{system}}')">{{system}}</span>&nbsp;
+	 {% endfor %}
+	 </div>
+
+    </div>
+    </div>
+
+
+  </body>
+    
+</html>

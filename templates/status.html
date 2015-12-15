@@ -254,6 +254,12 @@
         		document.getElementById(key+"-plots").style.display = "block";
         } }
       }
+      // minimize plots on body load
+      $( window ).load(setTimeout(function() {
+		{% for system in skelet %}
+		  showHidePlots("{{system}}");
+		{% endfor %}
+	  }, 2000));
       </script>
 
       <!-- Logging -->

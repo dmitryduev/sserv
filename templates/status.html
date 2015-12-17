@@ -277,7 +277,8 @@
          }
          $('#log').prepend("<p class=\"" + log_class + "\">"
                            + timestamp.toLocaleString() + "<br>" + text + "</p>");
-         beep(color);
+         // to beep or not to beep?
+         //beep(color);
       }
       
       // beep in case of emergency
@@ -355,8 +356,8 @@
     
   <body role="document" style="padding-top:0px; padding-bottom:0px; margin-bottom:0px">
 	
-	<audio id="beep-warning" src="http://www.soundjay.com/button/beep-07.wav"></audio>
-	<audio id="beep-danger" src="http://www.soundjay.com/button/beep-22.wav"></audio>
+	<audio id="beep-warning" src="http://www.soundjay.com/button/beep-22.wav"></audio>
+	<audio id="beep-danger" src="http://www.soundjay.com/button/beep-07.wav"></audio>
 	
     <div class="container-fluid theme-showcase" role="main">
 

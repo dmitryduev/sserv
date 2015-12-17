@@ -52,6 +52,14 @@ body {
    color: #f2d8d8;
 }
 
+.success {
+   color: #104014;
+}
+
+.info {
+   color: #101D40;
+}
+
     .dygraph-ylabel {
     	font-size: 10px;
     	line-height: 100%;

@@ -42,6 +42,12 @@
 	setInterval(function(){
     	$("#vicd").attr("src", "/static/vicd.png?"+new Date().getTime());
 	}, 500);
+	
+	$( "#wfs" )
+	  .error(function() {
+		$( this ).attr( "src", "/static/white.png" );
+	  });
+  
     </script>
     
     <style>
@@ -185,7 +191,7 @@
             <div id="img-inner">
 			<img src="static/dm.png" id="dm">
 			<img src="static/vicd.png" id="vicd">
-            <img src="static/wfs.png" id="wfs">
+            <img src="static/wfs.png" id="wfs" onError="$('$wfs').attr( 'src', '/static/white.png' );">
             </div>
             </div>
         </div>

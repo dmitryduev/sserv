@@ -69,6 +69,8 @@ class telemetry(object):
             except:
                 # no money - no honey
                 continue
+            if len(line)<5:
+                continue
             # reserve a spot for global params and subsys data:
             self.data[system] = {'globals':OrderedDict(), 'subs':OrderedDict()}
             # iterate over global params and subsystems

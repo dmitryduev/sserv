@@ -1,20 +1,19 @@
 {
     "Queue information": {
-        "data-file": "telemetry/queue_status",
+        "data-file": "telemetry/robod_status",
         "Time stamp": [[0, 2], {"success": [[-5, 2]], "danger": [[2, 1e9], [-1e9, -60]], "warning": [[-60, -5]]}, false, true],
-        "Project": [[2], {}, false, false],
+        "Project": [[9], {}, false, false],
         "Name": [[2], {}, false, false],
-        "State": [[2], {}, false, false],
+        "State": [[11], {}, false, false],
         "Object": {
-            "RA": [[2], {}, false, false],
-            "Dec": [[3], {}, false, false],
-            "RA rate": [[2], {}, false, false],
-            "Dec rate": [[3], {}, false, false],
-            "Mag": [[4], {}, false, false]
+            "RA": [[3], {}, false, false],
+            "Dec": [[4], {}, false, false],
+            "Epoch": [[5], {}, false, false],
+            "Mag": [[6], {}, false, false]
         },
         "Observation": {
-            "Exposure": [[8], {}, false, false],
-            "Filter": [[9], {}, false, false]
+            "Exposure, s": [[7], {}, false, false],
+            "Filter": [[8], {}, false, false]
         }
     },
     "Laser system": {
@@ -33,7 +32,7 @@
             "Interlock": [[3], {"success": ["CLSD"], "danger": ["OPEN"]}, false, false]
         },
         "Chiller": {
-            "T, °C": [[10], {"success": [[10, 20]], "danger": [[0, 5], [20, 30]], "warning": [[5, 10]]}, true, true],
+            "T, °C": [[10], {"success": [[9, 12]], "danger": [[-1e9, 9], [15, 1e9]], "warning": [[12, 15]]}, true, true],
             "Op, s": [[11], {"success": [[0, 10]], "danger": [[20, 32]], "warning": [[10, 20]]}, false, true],
             "Flow": [[8], {"success": ["FLOWING"], "danger": ["NO_FLOW"]}, false, true],
             "Reservoir": [[9], {"success": ["OK"], "danger": ["Error"]}, false, true]

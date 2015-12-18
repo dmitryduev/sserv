@@ -69,81 +69,84 @@ class telemetry(object):
             except:
                 # no money - no honey
                 continue
-            if len(line)<5:
+            if len(line)<3:
                 continue
             # reserve a spot for global params and subsys data:
             self.data[system] = {'globals':OrderedDict(), 'subs':OrderedDict()}
             # iterate over global params and subsystems
             for key in self.conf[system].keys():
-                # skip this:
-                if key == 'data-file':
-                    continue
-                # global params:
-                val = self.conf[system][key]
-                if type(val) == type([]):
-                    # get value from the proper position in the telemetry file
-                    self.data[system]['globals'][key] = line[val[0][0]] if len(val[0])==1 \
-                        else ' '.join(line[val[0][0]:val[0][-1]])
-                    tmp = self.data[system]['globals'][key]
-                    # get color:
-                    color_code = 'default'
-
-                    ## it's not str8forward with the Time stamp - 
-                    ## deal with it separately
-                    ## config.json lists ranges in seconds WRT datetime.now()
-                    # beware that it should all be in UTC!
-                    if 'time' in key.lower() or 'date' in key.lower():
-                        then = datetime.datetime.strptime(\
-                                self.data[system]['globals'][key], \
-                                '%Y-%m-%d %H:%M:%S.%f')
-                        now = datetime.datetime.utcnow()
-                        tmp = (then-now).total_seconds()
-
-                    # for the rest of the global params it is str8forward
-                    for code, rng in self.conf[system][key][1].iteritems():
-                        if type(rng[0])==type(u"") and tmp in rng:
-                            color_code = code
-                        elif type(rng[0])==type([]):
-                            for rn in rng:
-                                if rn[0]<= float(tmp) < rn[1]:
-                                    color_code = code
-
-                    # get plotting switch:
-                    plot_switch = self.conf[system][key][2]
-                    # get 'critical' switch:
-                    critical_switch = self.conf[system][key][3]
-                    self.data[system]['globals'][key] = \
-                                [self.data[system]['globals'][key], \
-                                    color_code, plot_switch, critical_switch]
-                
-                # 'sub-systems'
-                elif type(val) == type(OrderedDict()):
-                    self.data[system]['subs'][key] = OrderedDict()
-                    for key2 in val.keys():
-                        val2 = self.conf[system][key][key2][0]
-                        self.data[system]['subs'][key][key2] = line[val2[0]] \
-                            if len(val2)==1 else ' '.join(line[val2[0]:val2[-1]])
-                        tmp = self.data[system]['subs'][key][key2]
+                try:
+                    # skip this:
+                    if key == 'data-file':
+                        continue
+                    # global params:
+                    val = self.conf[system][key]
+                    if type(val) == type([]):
+                        # get value from the proper position in the telemetry file
+                        self.data[system]['globals'][key] = line[val[0][0]] if len(val[0])==1 \
+                            else ' '.join(line[val[0][0]:val[0][-1]])
+                        tmp = self.data[system]['globals'][key]
                         # get color:
                         color_code = 'default'
-                        for code, rng in self.conf[system][key][key2][1].iteritems():
-        #                    print tmp, rng, tmp in rng, type(rng[0])==type([])
+    
+                        ## it's not str8forward with the Time stamp - 
+                        ## deal with it separately
+                        ## config.json lists ranges in seconds WRT datetime.now()
+                        # beware that it should all be in UTC!
+                        if 'time' in key.lower() or 'date' in key.lower():
+                            then = datetime.datetime.strptime(\
+                                    self.data[system]['globals'][key], \
+                                    '%Y-%m-%d %H:%M:%S.%f')
+                            now = datetime.datetime.utcnow()
+                            tmp = (then-now).total_seconds()
+    
+                        # for the rest of the global params it is str8forward
+                        for code, rng in self.conf[system][key][1].iteritems():
                             if type(rng[0])==type(u"") and tmp in rng:
                                 color_code = code
                             elif type(rng[0])==type([]):
                                 for rn in rng:
-        #                            print rn, float(tmp)
                                     if rn[0]<= float(tmp) < rn[1]:
-        #                                print 'bingo!', tmp, code
                                         color_code = code
-                                        break
+    
                         # get plotting switch:
-                        plot_switch = self.conf[system][key][key2][2]
+                        plot_switch = self.conf[system][key][2]
                         # get 'critical' switch:
-                        critical_switch = self.conf[system][key][key2][3]
-                        self.data[system]['subs'][key][key2] = \
-                                [self.data[system]['subs'][key][key2], \
-                                    color_code, plot_switch, critical_switch]
+                        critical_switch = self.conf[system][key][3]
+                        self.data[system]['globals'][key] = \
+                                    [self.data[system]['globals'][key], \
+                                        color_code, plot_switch, critical_switch]
+                    
+                    # 'sub-systems'
+                    elif type(val) == type(OrderedDict()):
+                        self.data[system]['subs'][key] = OrderedDict()
+                        for key2 in val.keys():
+                            val2 = self.conf[system][key][key2][0]
+                            self.data[system]['subs'][key][key2] = line[val2[0]] \
+                                if len(val2)==1 else ' '.join(line[val2[0]:val2[-1]])
+                            tmp = self.data[system]['subs'][key][key2]
+                            # get color:
+                            color_code = 'default'
+                            for code, rng in self.conf[system][key][key2][1].iteritems():
+            #                    print tmp, rng, tmp in rng, type(rng[0])==type([])
+                                if type(rng[0])==type(u"") and tmp in rng:
+                                    color_code = code
+                                elif type(rng[0])==type([]):
+                                    for rn in rng:
+            #                            print rn, float(tmp)
+                                        if rn[0]<= float(tmp) < rn[1]:
+            #                                print 'bingo!', tmp, code
+                                            color_code = code
+                                            break
+                            # get plotting switch:
+                            plot_switch = self.conf[system][key][key2][2]
+                            # get 'critical' switch:
+                            critical_switch = self.conf[system][key][key2][3]
+                            self.data[system]['subs'][key][key2] = \
+                                    [self.data[system]['subs'][key][key2], \
+                                        color_code, plot_switch, critical_switch]
+                except:
+                    continue
         return self.data
 
 #%%

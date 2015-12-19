@@ -100,7 +100,7 @@
     	width: 1px;
     	position: relative;
     	left: 200px;
-    	top: -200px;
+    	top: -500px;
 	 }
 	 .horizontalLine {
     	border-bottom: 1px solid #009900;
@@ -108,18 +108,16 @@
     	width: 100px;
     	position: relative;
     	left: 150px;
-    	top: -250px;
+    	top: -550px;
 	 }
     }
     @media only screen and (max-width: 930px) {
      /* narrow screen: */
      #img-outer {
-      width: 95%;
       text-align: center; 
       margin-top: 0px;
      }
      #img-inner {
-      display: inline-block;
       width: 100%;
      }
      #dm {
@@ -150,7 +148,7 @@
     	height: 100px;
     	position: relative;
     	left: 51px;
-    	top: -351px;
+    	top: -651px;
 	 }
 	 .horizontalLine {
     	border-bottom: 1px solid #009900;
@@ -159,7 +157,7 @@
     	height: 1px;
     	position: relative;
     	left: 0px;
-    	top: -400px;
+    	top: -700px;
 	 }
     }
 	
@@ -241,8 +239,8 @@
             <div id="img-inner">
 			<img src="static/dm.png" id="dm" onError="loadWhite('#dm');">
 			<img src="static/vicd.png" id="vicd" onError="loadWhite('#vicd');" onClick="showHideCross();">
-            <div style="height:0px; width::0px;">
-            	<img src="static/wfs.png" id="wfs" onError="loadWhite('#wfs');">
+          	<img src="static/wfs.png" id="wfs" onError="loadWhite('#wfs');">
+            <div style="height:0px; width::0px; display: block;">
             </div>
               <div class="verticalLine" id="vl"></div>
               <div class="horizontalLine" id="hl"></div>

@@ -111,11 +111,3 @@ body {
        padding: 5px 10px;
     }
     
-    ::-webkit-scrollbar{
-  background:transparent;
-} //end of the code here
-// this code for further customization of thumbs
-::-webkit-scrollbar-thumb{
-   background-color: rgba(0,0,0,0);
-
-}

@@ -35,26 +35,39 @@
     <script>
 	setInterval(function(){
     	$("#dm").attr("src", "/static/dm.png?"+new Date().getTime());
-	}, 500);
-	setInterval(function(){
     	$("#wfs").attr("src", "/static/wfs.png?"+new Date().getTime());
-	}, 500);
-	setInterval(function(){
     	$("#vicd").attr("src", "/static/vicd.png?"+new Date().getTime());
 	}, 500);
 	
-	$( "#wfs" )
-	  .error(function() {
-		$( this ).attr( "src", "/static/white.png" );
-	  });
-  
+  	// dummy white img
+  	function loadWhite(id) {
+  		$(id).attr("src", "/static/white.png");
+  	}
+  	
+  	// show/hide cross
+  	function showHideCross() {
+
+  		if ($("#vl").css('display') == "inline-block") {
+  			$("#vl").fadeOut();
+  		}
+  		else { if ($("#vl").css('display') == "none") {
+  			$("#vl").fadeIn();
+  		}      }
+  		if ($("#hl").css('display') == "inline-block") {
+  			$("#hl").fadeOut();
+  		}
+  		else { if ($("#hl").css('display') == "none") {
+  			$("#hl").fadeIn();
+  		}      }
+  	}
+  	
     </script>
     
     <style>
     @media only screen and (min-width: 930px) {
      /* wide screen: */
      #img-outer {
-      width: 100%; 
+      width: 100%;
       text-align: center; 
       margin-top: -150px;
      }
@@ -80,16 +93,34 @@
       position:relative;
       bottom:150px;
      }
+     .verticalLine {
+    	border-left: 1px solid #009900;
+    	display: inline-block;
+    	height: 100px;
+    	width: 1px;
+    	position: relative;
+    	left: 200px;
+    	top: -200px;
+	 }
+	 .horizontalLine {
+    	border-bottom: 1px solid #009900;
+    	display: inline-block;
+    	width: 100px;
+    	position: relative;
+    	left: 150px;
+    	top: -250px;
+	 }
     }
     @media only screen and (max-width: 930px) {
      /* narrow screen: */
      #img-outer {
-      width: 100%; 
+      width: 95%;
       text-align: center; 
       margin-top: 0px;
      }
      #img-inner {
       display: inline-block;
+      width: 100%;
      }
      #dm {
       height:300px;
@@ -112,7 +143,26 @@
       left: 150px; 
       bottom: 900px;
      }
+     .verticalLine {
+    	border-left: 1px solid #009900;
+    	display: inline-block;
+    	width: 1px;
+    	height: 100px;
+    	position: relative;
+    	left: 51px;
+    	top: -351px;
+	 }
+	 .horizontalLine {
+    	border-bottom: 1px solid #009900;
+    	display: inline-block;
+    	width: 100px;
+    	height: 1px;
+    	position: relative;
+    	left: 0px;
+    	top: -400px;
+	 }
     }
+	
 
     </style>
     
@@ -189,16 +239,20 @@
 			<br><br>
             <div id="img-outer">
             <div id="img-inner">
-			<img src="static/dm.png" id="dm">
-			<img src="static/vicd.png" id="vicd">
-            <img src="static/wfs.png" id="wfs" onError="$('$wfs').attr( 'src', '/static/white.png' );">
+			<img src="static/dm.png" id="dm" onError="loadWhite('#dm');">
+			<img src="static/vicd.png" id="vicd" onError="loadWhite('#vicd');" onClick="showHideCross();">
+            <div style="height:0px; width::0px;">
+            	<img src="static/wfs.png" id="wfs" onError="loadWhite('#wfs');">
+            </div>
+              <div class="verticalLine" id="vl"></div>
+              <div class="horizontalLine" id="hl"></div>
             </div>
             </div>
         </div>
 <!--       <div class="col-md-1"></div> -->
       </div>
     </div>
-
+	<br><br><br><br><br><br><br><br><br><br>
 
   </body>
     

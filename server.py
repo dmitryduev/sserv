@@ -12,8 +12,9 @@ import argparse
 import cherrypy
 #from cherrypy.lib import auth_digest
 
-from jinja2 import Environment, FileSystemLoader
-env = Environment(loader=FileSystemLoader('templates'))
+#from jinja2 import Environment, FileSystemLoader
+#env = Environment(loader=FileSystemLoader('templates'))
+from jinja2 import Template
 
 import os
 
@@ -45,28 +46,37 @@ class Root(object):
         skelet = telemetry().skeleton()
         
         # render:
-        tmpl = env.get_template('status.html')
+#        tmpl = env.get_template('status.html')
+
+        with open('templates/status.html', 'r') as f:
+            html_tmpl = f.read()
+        tmpl = Template(html_tmpl)
         return tmpl.render(host=self.host, port=self.port, \
-                           skelet=skelet, layout='one')
+                           skelet=skelet, layout='one')        
         
     @cherrypy.expose
     def image(self):
 
         # render:
-        tmpl = env.get_template('image.html')
-        return tmpl.render(args=np.arange(10))
+#        tmpl = env.get_template('image.html')
+        with open('templates/image.html', 'r') as f:
+            html_tmpl = f.read()
+
+#        return tmpl.render(args=np.arange(10))
+        return html_tmpl
         
     @cherrypy.expose
     def ws(self):
-        cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
+#        cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
+        cherrypy.request.ws_handler
         
         
 #%%
 if __name__ == '__main__':
     
-    import logging
-    from ws4py import configure_logger
-    configure_logger(level=logging.DEBUG)
+#    import logging
+#    from ws4py import configure_logger
+#    configure_logger(level=logging.DEBUG)
 
     parser = argparse.ArgumentParser(description='Echo CherryPy Server')
     parser.add_argument('--host', default='0.0.0.0')
@@ -83,9 +93,9 @@ if __name__ == '__main__':
     # configure cherrypy
     cherrypy.config.update({'server.socket_host': args.host, #'0.0.0.0',
                              'server.socket_port': args.port, #8080,
-                             'server.thread_pool' : 8,
-                             'log.access_file': 'server_access.log',
-                             'log.error_file': 'server_actions.log'
+                             'server.thread_pool' : 8#,
+                             #'log.access_file': 'server_access.log',
+                             #'log.error_file': 'server_actions.log'
                             })
     
     conf = {

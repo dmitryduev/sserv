@@ -275,6 +275,12 @@
                log_class = "log-r";
                break;
          }
+         // too long, Johnny?
+         var nL = $("#log > *").length;
+         if (nL>100) {
+         	$("#log").empty();
+         }
+         // publish:
          $('#log').prepend("<p class=\"" + log_class + "\">"
                            + timestamp.toLocaleString() + "<br>" + text + "</p>");
          // to beep or not to beep?
